@@ -40,7 +40,8 @@ gulp.task('serve', ['style', 'inject'], function(){
         env: {
             'PORT': 3000
         },
-        watch: jsFiles
+        watch: jsFiles,
+        nodeArgs: ['--inspect']
         
     }
     return nodemon(options)

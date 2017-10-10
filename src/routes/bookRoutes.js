@@ -5,36 +5,15 @@ var mongodb = require('mongodb').MongoClient;
 var objectId = require('mongodb').ObjectID;
 
 var router = function (nav){
-    var books = [
-             {
-                 title: 'The Secret',
-                 genre: 'Self Motivation',
-                 author: 'Rhonda Byrne',
-                 read: false
-           },
-            {
-                title: 'The monk of ferrari',
-                genre: 'Self Motivation',
-                author: 'Robin Sharma',
-                 read: false
-            },
-           {
-               title: 'Father Son & co',
-               genre: 'Business',
-               author: 'Thomas J.Watson JR',
-                read: false
-           },
-           {
-               title: 'Inner Strength',
-               genre: 'Self Motivation',
-               author: 'Robin Sharma',
-               read: false
-           }
-    
-];
+   bookRouter.use(function(req,res,next) {
+                  if(!req.user){
+        res.redirect('/');
+    }
+         next();
+                  });
     bookRouter.route('/')
         .get(function(req,res){
-         // 
+         
          var url = 'mongodb://localhost:27017/libraryApp';
 
             mongodb.connect(url, function(err, db) {
@@ -51,6 +30,33 @@ var router = function (nav){
 
             });
         });
+    
+    bookRouter.route('/:id')
+        .get(function (req, res) {
+            var id = new objectId(req.params.id);
+            console.log('This is '+id);
+            var url =
+                'mongodb://localhost:27017/libraryApp';
+
+            mongodb.connect(url, function (err, db) {
+                var collection = db.collection('books');
+
+                collection.findOne({_id: id},
+                    function (err, results) {
+                        res.render('bookView', {
+                            title: 'Books',
+                            nav: nav,
+                            book: results
+                        });
+
+                    }
+                );
+
+            });
+
+        });
+
+    
 
         return bookRouter;
      };
